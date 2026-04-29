@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 const movies = reactive ([
    { id: 1, title: 'The Shawshank Redemption', year: 1994 },
    { id: 2, title: 'The Godfather', year: 1972 },
@@ -11,12 +11,36 @@ const newMovie = reactive({
    year: null
 });
 
+let showMessage =ref(false);
+
 const addMovie = () => {
    // Logic to add a movie
-   movies.push({id: movies.length +1 , title: newMovie.title, year: newMovie.year});
-   newMovie.title = '';
-   newMovie.year = null;
+   if (movies.length >=5) {
+      alert('Maximum of 5 movies allowed');  
+      return;
+   }else {
+      movies.push({id: movies.length +1 , title: newMovie.title, year: newMovie.year});
+      newMovie.title = '';
+      newMovie.year = null;
+   }
 };
+
+//function getAllMovies() {
+   // Logic to get all movies
+ //  return movies.map(movie => `${movie.title} was released in ${movie.year}`);
+//}
+
+const getAllMovies = computed(() => {
+   return movies.map(movie => `${movie.title} was released in ${movie.year}`);
+});
+
+watch(movies, () => {
+   if (movies.length >= 3) {
+      showMessage.value = true;
+   } else {
+      showMessage.value = false;
+   }
+});
 
 const removeMovie = () =>{
    // Logic to remove a movie
@@ -43,9 +67,11 @@ const removeMovie = () =>{
 
          <div class="movie-group">
             <h2>Movies</h2>
+            <p v-if="showMessage">You can add only 5 movies</p>
+
             <ul>
-               <li v-for="movie in movies" :key="movie.id">
-                  <span>{{ movie.title }} ({{ movie.year }})</span>
+               <li v-for="movie in getAllMovies" :key="movie.id">
+                  <span>{{ movie }}</span>
                </li>
             </ul>
          </div>
